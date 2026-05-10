@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Page Chat AI - 设置</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      padding: 30px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 22px; margin-bottom: 20px; }
+    h2 { font-size: 16px; margin: 20px 0 10px; color: #3498db; }
+
+    .provider-card {
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .provider-card.active { border-color: #3498db; }
+    .provider-card .badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #3498db;
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      display: none;
+    }
+    .provider-card.active .badge { display: inline-block; }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 180px;
+    }
+    .form-group label {
+      font-size: 11px;
+      color: #aaa;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .form-group input, .form-group select {
+      background: #1a1a2e;
+      border: 1px solid #0f3460;
+      color: #eee;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: #3498db; }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .btn-primary { background: #3498db; color: #fff; }
+    .btn-primary:hover { background: #2980b9; }
+    .btn-danger { background: #c0392b; color: #fff; }
+    .btn-danger:hover { background: #a93226; }
+    .btn-secondary { background: #0f3460; color: #eee; }
+    .btn-secondary:hover { background: #1a5276; }
+    .btn-success { background: #27ae60; color: #fff; }
+    .btn-success:hover { background: #229954; }
+
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #27ae60;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: none;
+      z-index: 999;
+    }
+    #toast.error { background: #c0392b; }
+  </style>
+</head>
+<body>
+  <h1>⚙️ Page Chat AI 设置</h1>
+
+  <h2>API Providers</h2>
+  <div id="providers-list"></div>
+
+  <div class="btn-row" style="margin-top:16px;">
+    <button class="btn-primary" id="btn-add-oai">+ OpenAI 兼容</button>
+    <button class="btn-primary" id="btn-add-claude">+ Claude 协议</button>
+  </div>
+
+  <h2>全局设置</h2>
+  <div class="form-row">
+    <div class="form-group">
+      <label>默认 System Prompt (可选)</label>
+      <input type="text" id="global-system-prompt" placeholder="你是一个智能助手...">
+    </div>
+  </div>
+
+  <h2>🔍 联网搜索 (Search Engine)</h2>
+  <div class="form-row">
+    <div class="form-group" style="flex:2;">
+      <label>API Base URL</label>
+      <input type="text" id="search-api-base" placeholder="https://api.x.ai (OpenAI兼容格式)">
+    </div>
+    <div class="form-group" style="flex:2;">
+      <label>API Key</label>
+      <input type="password" id="search-api-key" placeholder="xai-... / sk-...">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>模型名称</label>
+      <input type="text" id="search-model" placeholder="grok-3" value="grok-3">
+    </div>
+    <div class="form-group">
+      <label>搜索模式</label>
+      <select id="search-mode">
+        <option value="auto">自动 (LLM判断是否需要搜索)</option>
+        <option value="always">始终搜索</option>
+        <option value="off">关闭</option>
+      </select>
+    </div>
+  </div>
+  <p style="font-size:11px;color:#888;margin-top:4px;">配置后，用户提问时会先调用搜索引擎获取实时信息，再注入主LLM上下文。支持任何OpenAI兼容API（Grok/Perplexity等）。</p>
+
+  <h2>🔊 TTS 语音设置 (MiMo)</h2>
+  <div class="form-row">
+    <div class="form-group">
+      <label>API Key</label>
+      <input type="password" id="tts-api-key" placeholder="输入 MiMo API Key">
+    </div>
+    <div class="form-group">
+      <label>音色</label>
+      <select id="tts-voice">
+        <option value="冰糖">冰糖 (女)</option>
+        <option value="茉莉">茉莉 (女)</option>
+        <option value="苏打">苏打 (男)</option>
+        <option value="白桦">白桦 (男)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="btn-row" style="margin-top:16px;">
+    <button class="btn-success" id="btn-save">💾 保存所有设置</button>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="options.js"></script>
+</body>
+</html>

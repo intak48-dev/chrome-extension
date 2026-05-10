@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Page Chat AI</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #1a1a2e;
+      color: #eee;
+    }
+    #header {
+      padding: 10px 14px;
+      background: #16213e;
+      border-bottom: 1px solid #0f3460;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    #header h1 { font-size: 14px; font-weight: 600; }
+    #header .actions { display: flex; gap: 8px; }
+    #header button {
+      background: #0f3460;
+      border: none;
+      color: #eee;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    #header button:hover { background: #1a5276; }
+
+    #chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .msg {
+      max-width: 90%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .msg.user {
+      align-self: flex-end;
+      background: #0f3460;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .msg.assistant {
+      align-self: flex-start;
+      background: #222;
+      color: #ddd;
+      border-bottom-left-radius: 4px;
+    }
+    .msg.system-msg {
+      align-self: center;
+      background: #2d2d44;
+      color: #aaa;
+      font-size: 11px;
+      padding: 6px 12px;
+    }
+    .msg.error {
+      align-self: center;
+      background: #4a1c1c;
+      color: #ff6b6b;
+      font-size: 12px;
+    }
+
+    #input-area {
+      padding: 10px 12px;
+      background: #16213e;
+      border-top: 1px solid #0f3460;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    #image-preview {
+      display: none;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 4px 0;
+    }
+    #image-preview .img-thumb {
+      position: relative;
+      display: inline-block;
+    }
+    #image-preview .img-thumb img {
+      height: 48px;
+      border-radius: 6px;
+      border: 1px solid #0f3460;
+    }
+    #image-preview .img-thumb .remove-img {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      font-size: 10px;
+      cursor: pointer;
+      line-height: 16px;
+      text-align: center;
+    }
+    #input-row {
+      display: flex;
+      gap: 8px;
+    }
+    #input-row textarea {
+      flex: 1;
+      resize: none;
+      border: 1px solid #0f3460;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      background: #1a1a2e;
+      color: #eee;
+      outline: none;
+      min-height: 40px;
+      max-height: 120px;
+    }
+    #input-row textarea:focus { border-color: #3498db; }
+    #input-row button {
+      background: #3498db;
+      border: none;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      align-self: flex-end;
+    }
+    #input-row button:hover { background: #2980b9; }
+    #input-row button:disabled { background: #555; cursor: not-allowed; }
+    .drag-over textarea { border-color: #2ecc71 !important; background: #1a2e1a !important; }
+
+    #status-bar {
+      padding: 4px 14px;
+      font-size: 11px;
+      color: #888;
+      background: #111;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <h1>💬 Page Chat AI</h1>
+    <div class="actions">
+      <button id="btn-tts" title="语音朗读开关">🔇</button>
+      <button id="btn-grab">📄 抓取页面</button>
+      <button id="btn-clear">🗑️ 清空</button>
+      <button id="btn-settings">⚙️</button>
+    </div>
+  </div>
+
+  <div id="chat-container"></div>
+
+  <div id="input-area">
+    <div id="image-preview"></div>
+    <div id="input-row">
+      <textarea id="input" placeholder="输入消息... (Enter发送，Shift+Enter换行)" rows="2"></textarea>
+      <button id="btn-send">发送</button>
+    </div>
+  </div>
+
+  <div id="status-bar">
+    <span id="provider-name">未配置</span>
+    <span id="page-status">页面未抓取</span>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>
