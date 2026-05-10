@@ -168,3 +168,40 @@ function showToast(msg, isError = false) {
 function esc(str) {
   return str.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
+
+// === 导出/导入设置 ===
+const btnExport = document.getElementById('btn-export');
+const btnImport = document.getElementById('btn-import');
+const importFile = document.getElementById('import-file');
+
+btnExport.addEventListener('click', async () => {
+  const data = await chrome.storage.local.get(null);
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'page-chat-ai-settings.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📤 设置已导出');
+});
+
+btnImport.addEventListener('click', () => {
+  importFile.click();
+});
+
+importFile.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    await chrome.storage.local.clear();
+    await chrome.storage.local.set(data);
+    showToast('📥 设置已导入，页面将刷新');
+    setTimeout(() => location.reload(), 1000);
+  } catch (err) {
+    showToast('❌ 导入失败: ' + err.message, true);
+  }
+  importFile.value = '';
+});
